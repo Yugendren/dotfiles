@@ -1,0 +1,8 @@
+# macOS
+.DS_Store
+
+# stow leaves these when it can't fully unstow
+*.pre-dotfiles.bak
+
+# nvim runtime junk (mirrors nvim/.config/nvim/.gitignore)
+*.log

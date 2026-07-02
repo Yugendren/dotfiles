@@ -1,0 +1,9 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+format = "$directory"
+
+[directory]
+format = "[$path]($style) "
+style = "bold cyan"
+truncation_length = 0
+truncate_to_repo = false
