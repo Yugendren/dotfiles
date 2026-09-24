@@ -57,6 +57,11 @@ if [[ ! -e "$HOME/.tmux/.tmux.conf" ]]; then
   git clone --depth=1 https://github.com/gpakosz/.tmux.git "$HOME/.tmux"
   ln -sf "$HOME/.tmux/.tmux.conf" "$HOME/.tmux.conf"
 fi
+# TPM — needed for tmux-resurrect / tmux-continuum declared in .tmux.conf.local
+if [[ ! -d "$HOME/.tmux/plugins/tpm" ]]; then
+  info "Installing tmux plugin manager..."
+  git clone --depth=1 https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
+fi
 
 # --- 6. Stow all packages ------------------------------------------------
 info "Symlinking dotfiles with stow..."
@@ -76,7 +81,20 @@ for pkg in zsh tmux nvim starship ghostty bat git; do
   }
 done
 
-# --- 7. Post-install -----------------------------------------------------
+# --- 7. Machine-local secrets file --------------------------------------
+if [[ ! -f "$HOME/.zshrc.local" ]]; then
+  cat > "$HOME/.zshrc.local" <<'LOCAL'
+# Machine-local zsh config — sourced at the end of ~/.zshrc, never committed.
+# Put API keys and per-machine tweaks here, e.g.:
+# export DEEPSEEK_API_KEY="..."
+LOCAL
+  info "Created ~/.zshrc.local — add your API keys there."
+fi
+
+# Install tmux plugins non-interactively
+[[ -x "$HOME/.tmux/plugins/tpm/bin/install_plugins" ]] && "$HOME/.tmux/plugins/tpm/bin/install_plugins" >/dev/null 2>&1 || true
+
+# --- 8. Post-install -----------------------------------------------------
 # Build bat's cache so the custom Catppuccin theme is available.
 command -v bat >/dev/null 2>&1 && bat cache --build || true
 

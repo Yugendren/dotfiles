@@ -8,7 +8,7 @@ Managed with [GNU Stow](https://www.gnu.org/software/stow/); tools installed via
 | Package    | Links to                     | Notes |
 |------------|------------------------------|-------|
 | `zsh`      | `~/.zshrc`, `~/.zprofile`    | Oh My Zsh + Starship. OS-guarded (macOS vs WSL). |
-| `tmux`     | `~/.tmux/.tmux.conf.local`   | Customization for [oh-my-tmux](https://github.com/gpakosz/.tmux) (framework cloned by installer). |
+| `tmux`     | `~/.tmux.conf.local`         | Customization for [oh-my-tmux](https://github.com/gpakosz/.tmux) (framework + TPM cloned by installer). Prefix `C-a`, mouse, vi keys, OSC 52 clipboard, resurrect/continuum. |
 | `nvim`     | `~/.config/nvim`             | [LazyVim](https://www.lazyvim.org/) config + `lazy-lock.json` (pinned plugins). |
 | `starship` | `~/.config/starship.toml`    | |
 | `ghostty`  | `~/.config/ghostty/config`   | **macOS only** (see WSL note below). |
@@ -26,6 +26,8 @@ cd ~/dotfiles
 The installer is idempotent: it installs Homebrew (if missing), runs the `Brewfile`,
 installs Oh My Zsh + third-party zsh plugins, clones oh-my-tmux, and stows everything.
 Existing real files are backed up to `*.pre-dotfiles.bak` before symlinking.
+
+Secrets (API keys) and per-machine tweaks go in `~/.zshrc.local` — sourced by `.zshrc`, never committed.
 
 Then: `chsh -s "$(command -v zsh)"` (if zsh isn't your default shell) and open a new terminal.
 

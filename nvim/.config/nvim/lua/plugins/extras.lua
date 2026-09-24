@@ -19,28 +19,6 @@ return {
     opts = { use_diagnostic_signs = true },
   },
 
-  -- Dim inactive code blocks / unused variables
-  {
-    "folke/twilight.nvim",
-    cmd = "Twilight",
-    keys = {
-      { "<leader>ut", "<cmd>Twilight<cr>", desc = "Toggle Twilight" },
-    },
-    opts = {},
-  },
-
-  -- Zen mode for focused editing
-  {
-    "folke/zen-mode.nvim",
-    cmd = "ZenMode",
-    keys = {
-      { "<leader>uz", "<cmd>ZenMode<cr>", desc = "Toggle Zen Mode" },
-    },
-    opts = {
-      window = { width = 120 },
-    },
-  },
-
   -- Better marks with visual indicators
   {
     "chentoast/marks.nvim",

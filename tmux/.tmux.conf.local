@@ -370,7 +370,7 @@ tmux_conf_theme_clock_style="24"
 #   - false (default)
 #   - disabled
 # on Linux, this requires xsel, xclip or wl-copy
-tmux_conf_copy_to_os_clipboard=false
+tmux_conf_copy_to_os_clipboard=true
 
 
 # -- urlscan -------------------------------------------------------------------
@@ -384,15 +384,32 @@ tmux_conf_urlscan_options="--compact --dedupe"
 # this is the place to override or undo settings
 
 # increase history size
-#set -g history-limit 10000
+set -g history-limit 50000
 
 # start with mouse mode enabled
-#set -g mouse on
+set -g mouse on
 
 # force Vi mode
-#   really you should export VISUAL or EDITOR environment variable, see manual
-#set -g status-keys vi
-#set -g mode-keys vi
+set -g status-keys vi
+set -g mode-keys vi
+
+# ── OSC 52 clipboard (copy from remote VM → Mac clipboard) ──
+set -g set-clipboard on
+set -g allow-passthrough on
+set -ag terminal-overrides ",xterm*:Ms=\\E]52;c;%p2%s\\7"
+
+# vertical split with |
+bind | split-window -h
+set -ag terminal-overrides ",screen*:Ms=\\E]52;c;%p2%s\\7"
+
+# ── True color support ──
+set -g default-terminal "tmux-256color"
+set -ag terminal-overrides ",xterm-256color:RGB"
+set -ag terminal-overrides ",*256col*:RGB"
+
+# ── Quality of life ──
+set -g detach-on-destroy off
+set -g renumber-windows on
 
 # replace C-b by C-a instead of using both prefixes
 # set -gu prefix2
@@ -400,6 +417,15 @@ tmux_conf_urlscan_options="--compact --dedupe"
 # unbind C-b
 # set -g prefix C-a
 # bind C-a send-prefix
+
+# OLED-friendly HUD: keep the status line hidden, then show it for 2 seconds
+# whenever C-a is pressed. The root-table binding enters tmux's
+# normal prefix table, so existing C-a shortcuts continue to work.
+set -g status off #!important
+set -g prefix None #!important
+set -g prefix2 None #!important
+bind-key -n C-a set-option -g status on \; switch-client -T prefix \; run-shell -b 'token=$$; tmux set-option -g @oled_hud_token "$token"; sleep 2; if [ "$(tmux show-option -gqv @oled_hud_token)" = "$token" ]; then tmux set-option -g status off; fi' #!important
+bind-key -T prefix C-a send-keys C-a #!important
 
 # if you don't want Oh my tmux! to alter a binding or a setting, use #!important
 # bind c new-window -c '#{pane_current_path}' #!important
@@ -446,12 +472,12 @@ tmux_conf_uninstall_plugins_on_reload=true
 
 # /!\ the 'set -g @tpm_plugins' syntax is not supported
 # to enable a plugin, use the 'set -g @plugin' syntax:
-# visit https://github.com/tmux-plugins for available plugins
+#visit https://github.com/tmux-plugins for available plugins
 #set -g @plugin 'tmux-plugins/tmux-copycat'
 #set -g @plugin 'tmux-plugins/tmux-cpu'
-#set -g @plugin 'tmux-plugins/tmux-resurrect'
-#set -g @plugin 'tmux-plugins/tmux-continuum'
-#set -g @continuum-restore 'on'
+set -g @plugin 'tmux-plugins/tmux-resurrect'
+set -g @plugin 'tmux-plugins/tmux-continuum'
+set -g @continuum-restore 'on'
 
 
 # -- custom variables ----------------------------------------------------------

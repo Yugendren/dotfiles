@@ -24,6 +24,8 @@ brew "tldr"              # concise man pages
 # ---- Editor / multiplexer ----
 brew "neovim"
 brew "tmux"
+brew "mosh"              # used by `mvm` (mosh + tmux)
+brew "stow"              # symlinks these dotfiles
 
 # ---- Data tools (referenced by .zshrc aliases) ----
 brew "csvlens"

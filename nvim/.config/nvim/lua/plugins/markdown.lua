@@ -37,12 +37,16 @@ return {
       workspaces = {
         {
           name = "research",
-          path = "~/Documents/research", -- change to your vault path
+          path = "~/Documents/research",
+        },
+        {
+          name = "book",
+          path = "~/book", -- [[wiki links]] and backlinks across manuscript notes
         },
       },
-      completion = { nvim_cmp = true, min_chars = 2 },
+      legacy_commands = false,
       ui = { enable = false }, -- let markview handle the visuals
-      picker = { name = "telescope.nvim" },
+      picker = { name = "snacks.pick" }, -- telescope isn't installed; snacks is
       daily_notes = { folder = "daily" },
     },
   },
@@ -67,20 +71,5 @@ return {
       max_width = 100,
       max_height = 12,
     },
-  },
-
-  -- Distraction-free reading: <leader>uz to toggle
-  {
-    "folke/zen-mode.nvim",
-    cmd = "ZenMode",
-    keys = { { "<leader>uz", "<cmd>ZenMode<cr>", desc = "Zen Mode" } },
-    opts = { window = { width = 0.75 } },
-  },
-
-  -- Dim non-current paragraphs in zen mode
-  {
-    "folke/twilight.nvim",
-    cmd = { "Twilight", "TwilightEnable" },
-    opts = {},
   },
 }

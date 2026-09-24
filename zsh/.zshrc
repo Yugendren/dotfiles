@@ -1,3 +1,8 @@
+# Exit early if this is a non-interactive shell or a dumb terminal (e.g., omp agent subshells)
+if [[ $- != *i* ]] || [[ "$TERM" == "dumb" ]]; then
+  return
+fi
+
 # Path to Oh My Zsh installation
 export ZSH="$HOME/.oh-my-zsh"
 
@@ -120,6 +125,7 @@ alias py="python3"
 alias ipy="ipython"
 alias jn="jupyter notebook"
 alias jl="jupyter lab"
+alias md='glow -p'
 alias venv="python3 -m venv .venv && source .venv/bin/activate"
 alias activate="source .venv/bin/activate"
 
@@ -151,3 +157,7 @@ setopt HIST_REDUCE_BLANKS
 # History substring search keybindings (up/down arrow)
 bindkey '^[[A' history-substring-search-up
 bindkey '^[[B' history-substring-search-down
+
+# ---- Machine-local config & secrets (NOT in git) ----
+# Put API keys and per-machine PATH tweaks in ~/.zshrc.local
+[[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"

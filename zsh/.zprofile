@@ -6,3 +6,6 @@ elif [[ -x /usr/local/bin/brew ]]; then
 elif [[ -x /home/linuxbrew/.linuxbrew/bin/brew ]]; then
   eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"  # Linux / WSL
 fi
+
+export PATH="$HOME/.local/bin:$PATH"
+[[ -d "$HOME/.elan/bin" ]] && export PATH="$HOME/.elan/bin:$PATH"   # Lean toolchain, if installed
