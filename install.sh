@@ -66,7 +66,7 @@ fi
 # --- 6. Stow all packages ------------------------------------------------
 info "Symlinking dotfiles with stow..."
 # --adopt would pull existing files in; we back them up instead, then restow.
-for pkg in zsh tmux nvim starship ghostty bat git; do
+for pkg in zsh tmux nvim starship ghostty bat git claude; do
   # ghostty is macOS-only
   if [[ "$pkg" == "ghostty" && "$(uname)" != "Darwin" ]]; then
     info "Skipping ghostty (macOS-only terminal)."
@@ -81,7 +81,26 @@ for pkg in zsh tmux nvim starship ghostty bat git; do
   }
 done
 
-# --- 7. Machine-local secrets file --------------------------------------
+# --- 7. Claude Code ------------------------------------------------------
+if ! command -v claude >/dev/null 2>&1; then
+  info "Installing Claude Code..."
+  curl -fsSL https://claude.ai/install.sh | bash
+  export PATH="$HOME/.local/bin:$PATH"
+fi
+# settings.json is copied, not symlinked: Claude Code rewrites it in place,
+# which would silently replace a symlink. Re-run install.sh to re-apply.
+mkdir -p "$HOME/.claude"
+if [[ -f "$HOME/.claude/settings.json" ]] && ! cmp -s "$DOTFILES/claude-settings/settings.json" "$HOME/.claude/settings.json"; then
+  cp "$HOME/.claude/settings.json" "$HOME/.claude/settings.json.pre-dotfiles.bak"
+fi
+cp "$DOTFILES/claude-settings/settings.json" "$HOME/.claude/settings.json"
+if command -v claude >/dev/null 2>&1; then
+  for p in clangd-lsp swift-lsp; do
+    claude plugin install "$p@claude-plugins-official" >/dev/null 2>&1 || true
+  done
+fi
+
+# --- 8. Machine-local secrets file --------------------------------------
 if [[ ! -f "$HOME/.zshrc.local" ]]; then
   cat > "$HOME/.zshrc.local" <<'LOCAL'
 # Machine-local zsh config — sourced at the end of ~/.zshrc, never committed.
@@ -94,7 +113,7 @@ fi
 # Install tmux plugins non-interactively
 [[ -x "$HOME/.tmux/plugins/tpm/bin/install_plugins" ]] && "$HOME/.tmux/plugins/tpm/bin/install_plugins" >/dev/null 2>&1 || true
 
-# --- 8. Post-install -----------------------------------------------------
+# --- 9. Post-install -----------------------------------------------------
 # Build bat's cache so the custom Catppuccin theme is available.
 command -v bat >/dev/null 2>&1 && bat cache --build || true
 
@@ -105,3 +124,4 @@ fi
 
 info "Done. Open a new terminal (or run: exec zsh)."
 info "In nvim, plugins install automatically on first launch (LazyVim)."
+info "Claude Code: run \`claude\` and log in (or export ANTHROPIC_API_KEY in ~/.zshrc.local)."

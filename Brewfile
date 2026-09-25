@@ -19,6 +19,7 @@ brew "btop"              # top
 brew "git-delta"         # git pager (delta)
 brew "lazygit"           # git TUI (lg)
 brew "glow"              # markdown viewer
+brew "jq"                # used by the Claude Code statusline
 brew "tldr"              # concise man pages
 
 # ---- Editor / multiplexer ----
