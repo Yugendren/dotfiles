@@ -86,8 +86,10 @@ for pkg in zsh tmux nvim starship ghostty bat git claude bin; do
 done
 
 # --- 7. Claude Code ------------------------------------------------------
-if ! command -v claude >/dev/null 2>&1; then
-  info "Installing Claude Code..."
+# Check for the native install specifically: an older npm/Homebrew `claude`
+# elsewhere on PATH would otherwise make us skip this, and `dclaude` needs it here.
+if [[ ! -x "$HOME/.local/bin/claude" ]]; then
+  info "Installing Claude Code (native)..."
   curl -fsSL https://claude.ai/install.sh | bash
   export PATH="$HOME/.local/bin:$PATH"
 fi
