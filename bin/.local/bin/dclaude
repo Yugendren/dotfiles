@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+# Check for DeepSeek API Key
+if [ -z "$DEEPSEEK_API_KEY" ]; then
+  if [ -f "$HOME/.claude-deepseek/.env" ]; then
+    source "$HOME/.claude-deepseek/.env"
+  fi
+  for rc in "$HOME/.zshrc.local" "$HOME/.zshrc"; do
+    [ -n "$DEEPSEEK_API_KEY" ] && break
+    [ -f "$rc" ] || continue
+    DEEPSEEK_API_KEY=$(grep -E '^[[:space:]]*export[[:space:]]+DEEPSEEK_API_KEY=' "$rc" | tail -n1 | cut -d= -f2- | tr -d '"'"'")
+  done
+  export DEEPSEEK_API_KEY
+fi
+
+if [ -z "$DEEPSEEK_API_KEY" ]; then
+  echo "Error: DEEPSEEK_API_KEY is not set." >&2
+  echo "Run: export DEEPSEEK_API_KEY='sk-...'  (or put it in ~/.zshrc.local or ~/.claude-deepseek/.env)" >&2
+  exit 1
+fi
+
+# 1. Isolate the config directory so ~/.claude is untouched
+export CLAUDE_CONFIG_DIR="$HOME/.claude-deepseek"
+mkdir -p "$CLAUDE_CONFIG_DIR"
+
+# 2. Configure DeepSeek-V4.1-Flash (1M context) across ALL model slots
+# (Overriding Opus, Sonnet, Haiku, and subagents to strictly use Flash, never Pro)
+export ANTHROPIC_BASE_URL="https://api.deepseek.com/anthropic"
+export ANTHROPIC_AUTH_TOKEN="$DEEPSEEK_API_KEY"
+export ANTHROPIC_MODEL="deepseek-flash[1m]"
+export ANTHROPIC_DEFAULT_OPUS_MODEL="deepseek-flash[1m]"
+export ANTHROPIC_DEFAULT_SONNET_MODEL="deepseek-flash[1m]"
+export ANTHROPIC_DEFAULT_HAIKU_MODEL="deepseek-flash"
+export CLAUDE_CODE_SUBAGENT_MODEL="deepseek-flash"
+export CLAUDE_CODE_EFFORT_LEVEL="max"
+export CLAUDE_CODE_AUTO_COMPACT_WINDOW="786432"
+
+# 3. Launch Claude Code binary
+exec "$HOME/.local/bin/claude" "$@"

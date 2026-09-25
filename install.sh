@@ -66,18 +66,22 @@ fi
 # --- 6. Stow all packages ------------------------------------------------
 info "Symlinking dotfiles with stow..."
 # --adopt would pull existing files in; we back them up instead, then restow.
-for pkg in zsh tmux nvim starship ghostty bat git claude; do
+# Pre-create dirs that other tools also write into, and use --no-folding, so stow
+# links individual files instead of turning ~/.claude or ~/.local/bin into a
+# symlink into this repo (which would drop history/binaries into git).
+mkdir -p "$HOME/.claude" "$HOME/.claude-deepseek" "$HOME/.local/bin" "$HOME/.config"
+for pkg in zsh tmux nvim starship ghostty bat git claude bin; do
   # ghostty is macOS-only
   if [[ "$pkg" == "ghostty" && "$(uname)" != "Darwin" ]]; then
     info "Skipping ghostty (macOS-only terminal)."
     continue
   fi
-  stow --restow --target="$HOME" "$pkg" 2>/dev/null || {
+  stow --no-folding --restow --target="$HOME" "$pkg" 2>/dev/null || {
     info "Conflicts in '$pkg' — backing up existing files and retrying..."
     while IFS= read -r f; do
       [[ -e "$HOME/$f" && ! -L "$HOME/$f" ]] && mv "$HOME/$f" "$HOME/$f.pre-dotfiles.bak"
-    done < <(cd "$pkg" && find . -type f | sed 's|^\./||')
-    stow --restow --target="$HOME" "$pkg"
+    done < <(cd "$pkg" && find . \( -type f -o -type l \) | sed 's|^\./||')
+    stow --no-folding --restow --target="$HOME" "$pkg"
   }
 done
 
@@ -94,6 +98,11 @@ if [[ -f "$HOME/.claude/settings.json" ]] && ! cmp -s "$DOTFILES/claude-settings
   cp "$HOME/.claude/settings.json" "$HOME/.claude/settings.json.pre-dotfiles.bak"
 fi
 cp "$DOTFILES/claude-settings/settings.json" "$HOME/.claude/settings.json"
+# DeepSeek-backed Claude (`dclaude`) keeps its own config dir
+if [[ -f "$HOME/.claude-deepseek/settings.json" ]] && ! cmp -s "$DOTFILES/claude-settings/settings-deepseek.json" "$HOME/.claude-deepseek/settings.json"; then
+  cp "$HOME/.claude-deepseek/settings.json" "$HOME/.claude-deepseek/settings.json.pre-dotfiles.bak"
+fi
+cp "$DOTFILES/claude-settings/settings-deepseek.json" "$HOME/.claude-deepseek/settings.json"
 if command -v claude >/dev/null 2>&1; then
   for p in clangd-lsp swift-lsp; do
     claude plugin install "$p@claude-plugins-official" >/dev/null 2>&1 || true
@@ -125,3 +134,4 @@ fi
 info "Done. Open a new terminal (or run: exec zsh)."
 info "In nvim, plugins install automatically on first launch (LazyVim)."
 info "Claude Code: run \`claude\` and log in (or export ANTHROPIC_API_KEY in ~/.zshrc.local)."
+info "DeepSeek Claude: export DEEPSEEK_API_KEY=sk-...  then run \`dclaude\`."

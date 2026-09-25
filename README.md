@@ -15,7 +15,8 @@ Managed with [GNU Stow](https://www.gnu.org/software/stow/); tools installed via
 | `bat`      | `~/.config/bat/`             | Catppuccin Mocha theme. |
 | `git`      | `~/.gitconfig`, `~/.config/git/ignore` | delta pager. |
 | `claude`   | `~/.claude/agents/`, `~/.claude/statusline-command.sh` | Claude Code agents (lead/worker/runner/explainer) + statusline. |
-| `claude-settings` | copied to `~/.claude/settings.json` | Copied, not linked (Claude Code rewrites it). After changing settings, copy back: `cp ~/.claude/settings.json ~/dotfiles/claude-settings/`. |
+| `bin`      | `~/.local/bin/dclaude` (+ `deepseek-code` alias) | Claude Code routed to DeepSeek, separate config in `~/.claude-deepseek`. Needs `export DEEPSEEK_API_KEY=...` first. |
+| `claude-settings` | copied to `~/.claude/settings.json` and `~/.claude-deepseek/settings.json` | Copied, not linked (Claude Code rewrites it). After changing settings, copy back: `cp ~/.claude/settings.json ~/dotfiles/claude-settings/`. |
 
 ## Install (macOS or Linux/WSL)
 
